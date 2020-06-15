@@ -1,5 +1,9 @@
-module.exports = (sequelize,Sequelize) => {
-        const Producto=sequelize.define('producto',{
+const Sequelize = require('sequelize');
+const db = require('../database/db.js');
+
+module.exports = db.sequelize.define(
+    'producto',
+    {
         id: {
             type: Sequelize.INTEGER,
             primaryKey: true,
@@ -25,6 +29,5 @@ module.exports = (sequelize,Sequelize) => {
     },
     {
         timestamps: false
-    })
-    return Producto;
-}
+    }
+)

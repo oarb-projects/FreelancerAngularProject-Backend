@@ -4,25 +4,60 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
-const Usuario = require("../models/Usuario");
+// const Usuario = require("../models/Usuario");
+const db = require('../database/db.js');
+// const Compania = db.Compania ;
+const Usuario = db.User;
+const Compania=db.Compania;
+// Detalle_Alta
+
+
+
 usuarios.use(cors());
 
 process.env.SECRET_KEY = 'secret';
+
+// Oscar Rosete Deliverable
+usuarios.get('/vendedores/:company_id', (req, res) => {
+    console.log(req.params.company_id)
+
+    Compania.findAll({
+        where: {
+            com_id:req.params.company_id
+        },    
+        include: [{
+          model: Usuario,
+          as: 'Sellers',
+        }]
+      }).then( loc => {
+        // console.log(loc);
+        res.json(loc[0].Sellers)
+        // res.json(loc[0].sellers)
+    })
+    //   });
+    // Usuario.findAll({
+    //     where:{
+    //         // usu_correo:'oscar.rosete@cetys.edu.mx'
+    //     }   
+    // }).then(()=>{
+
+    // })
+})
 
 //REGISTRO
 usuarios.post('/register', (req, res) => {
     const today = new Date();
     const usuarioData = {
-        usu_nombre: req.body.correo,
+        usu_nombre: req.body.nombre,
         usu_apellido: req.body.apellido,
         usu_correo: req.body.correo,
         usu_password: req.body.password,
-        /*usu_fecha_nacimiento,
-        usu_telefono_personal,
-        usu_telefono_oficina,
-        usu_pagina_web,
-        usu_id_rol,
-        usu_activo*/
+        usu_telefono_personal: req.body.telefonoPersonal,
+        usu_telefono_oficina: req.body.telefonoOficina,
+        usu_pagina_web: req.body.paginaWeb,
+        usu_id_rol: 1,
+        usu_activo: 1
+        //nombreCompania: registerFormValue.nombreCompania,        
     }
 
     Usuario.findOne({        
@@ -31,8 +66,8 @@ usuarios.post('/register', (req, res) => {
         }
     }).then(usuario => {
         if (!usuario) {
-            let hash = bcrypt.hashSync(usuarioData.password, 10);
-            usuarioData.password = hash;
+            let hash = bcrypt.hashSync(usuarioData.usu_password, 10);
+            usuarioData.usu_password = hash;
             
             Usuario.create(usuarioData)
                 .then(usuario => {
@@ -78,7 +113,7 @@ usuarios.get('/profile', (req, res) => {
 
     Usuario.findOne({
         where: {
-            id: decoded.id
+            usu_id: decoded.usu_id
         }
     }).then(usuario => {
         if(usuario) {

@@ -19,6 +19,15 @@ app.use(
 
 //variables globales
 
+//sync tables
+const db = require('./database/db.js');  
+db.sequelize.sync() .then(() => {
+    console.info("Tables created or successfully checked");
+}).catch((err)=>{
+    console.log("===err")
+    console.log(err)
+});
+
 //rutas
 app.use(require('./routes'));
 

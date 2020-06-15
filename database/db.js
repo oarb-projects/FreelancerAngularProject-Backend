@@ -11,7 +11,8 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
       min: dbConfig.pool.min,
       acquire: dbConfig.pool.acquire,
       idle: dbConfig.pool.idle
-    },
+    }
+    ,
     define: {
         freezeTableName: true
     }
@@ -20,4 +21,21 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
+
+db.Product = require("../models/Producto")(sequelize, Sequelize);
+db.User = require("../models/Usuario")(sequelize, Sequelize);
+db.Compania = require("../models/Compania")(sequelize, Sequelize);
+db.Detalle_Alta = require("../models/Detalle_Alta")(sequelize, Sequelize);
+db.Detalle_BAJA = require("../models/Detalle_Baja")(sequelize, Sequelize);
+
+// console.log("====db")
+var company_user = sequelize.define('COMPANIA_USUARIO', {
+
+}, {
+  timestamps: false
+})
+
+db.Compania.belongsToMany(db.User, { as: 'Sellers', through: company_user, foreignKey: 'com_id', otherKey: 'usu_id'});
+// db.user.belongsToMany(db.project, { as: 'Tasks', through: 'worker_tasks', foreignKey: 'userId', otherKey: 'projectId'});
+ 
 module.exports = db;

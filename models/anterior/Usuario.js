@@ -1,5 +1,9 @@
-module.exports = (sequelize,Sequelize) => {
-    const Usuario=sequelize.define('usuario',{
+const Sequelize = require('sequelize');
+const db = require('../database/db.js');
+
+module.exports = db.sequelize.define(
+    'usuario',
+    {
         usu_id: {
             type: Sequelize.INTEGER,
             primaryKey: true,
@@ -38,8 +42,9 @@ module.exports = (sequelize,Sequelize) => {
         }        
     },
     {
-        timestamps:false,
+        timestamps: false
+    }, 
+    {
         tableName: 'USUARIO'
-    })
-return Usuario
-}
+    }
+)
