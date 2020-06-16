@@ -26,7 +26,7 @@ db.Product = require("../models/Producto")(sequelize, Sequelize);
 db.User = require("../models/Usuario")(sequelize, Sequelize);
 db.Compania = require("../models/Compania")(sequelize, Sequelize);
 db.Detalle_Alta = require("../models/Detalle_Alta")(sequelize, Sequelize);
-db.Detalle_BAJA = require("../models/Detalle_Baja")(sequelize, Sequelize);
+db.Detalle_Baja = require("../models/Detalle_Baja")(sequelize, Sequelize);
 
 // console.log("====db")
 var company_user = sequelize.define('COMPANIA_USUARIO', {

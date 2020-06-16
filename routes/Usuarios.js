@@ -9,6 +9,8 @@ const db = require('../database/db.js');
 // const Compania = db.Compania ;
 const Usuario = db.User;
 const Compania=db.Compania;
+const Detalle_Alta=db.Detalle_Alta;
+const Detalle_Baja=db.Detalle_Baja;
 // Detalle_Alta
 
 
@@ -17,7 +19,8 @@ usuarios.use(cors());
 
 process.env.SECRET_KEY = 'secret';
 
-// Oscar Rosete Deliverable
+// Oscar Rosete Deliverable BEGINS
+//Get All Sellers
 usuarios.get('/vendedores/:company_id', (req, res) => {
     console.log(req.params.company_id)
     Compania.findAll({
@@ -35,7 +38,7 @@ usuarios.get('/vendedores/:company_id', (req, res) => {
         res.json(loc[0].Sellers)
     })
 })
-
+//Generate Seller
 usuarios.post('/vendedores/:company_id', (req, res) => {
     const usuarioData = {
         usu_nombre: req.body.nombre,
@@ -67,11 +70,22 @@ usuarios.post('/vendedores/:company_id', (req, res) => {
                 Usuario.create(usuarioData).then(usuario => {
                     // console.log(usuario)
                     company[0].addSellers([usuario]).then(associatedTasks => {
-                        // you will get an empty array
-                        // res.json(associatedTasks)
-                        res.json(associatedTasks)
+                        let detail={
+                            com_id:associatedTasks[0].com_id,
+                            usu_id:associatedTasks[0].usu_id
+                        }
+                        Detalle_Alta.create(detail).then((createdDetail)=>{
+                            console.log("====added to detalle alta")
+                            console.log(detail)  
+                            console.log(createdDetail)  
+                            res.json({
+                                detail:createdDetail,
+                                associatedTasks:associatedTasks
+                            })
+                        })
                     }).catch(err=>{
-                        console.log("eror set sellers")
+                        console.log("==========eror set sellers")
+                        console.log(err)
                     })
                     
                 }).catch(err => {
@@ -89,27 +103,42 @@ usuarios.post('/vendedores/:company_id', (req, res) => {
         res.json({error:"db error"})
     });
 })
-
+//Delete Seller
 usuarios.delete('/profile/:user_id',(req,res)=>{
-    console.log("delete route")
+    console.log("==============delete route")
     Usuario.findOne({
         where:{
             usu_id:req.params.user_id
         }
     }).then((user)=>{
-        // console.log(req.params.user_id)
-        // console.log(req.body)
+        console.log(req.params.user_id)
+        console.log(req.body)
         user.update({
             usu_activo:0
         }).then((user)=>{
-            res.json(user)
+            // res.json(user)
+            console.log("===detail object")
+            let detail={
+                com_id: Number(req.body.company),
+                usu_id:req.body.userId
+            }
+            console.log(detail)
+            Detalle_Baja.create(detail).then((createdDetail)=>{
+                console.log("====added to detalle alta")
+                console.log(detail)  
+                console.log(createdDetail)  
+                res.json({
+                    detail:createdDetail,
+                    user
+                })
+            })
         })
     }).catch(()=>{
         res.send("something went wrong")
     })
 
 })
-
+//Get Seller Info
 usuarios.get('/profile/:user_id', (req, res) => {
     Usuario.findOne({        
         where: {
@@ -128,7 +157,7 @@ usuarios.get('/profile/:user_id', (req, res) => {
         }
     })
 })
-
+//Edit Seller
 usuarios.post('/profile/:user_id', (req, res) => {
     console.log("you are trying to modify an user");
     console.log(req.body)
@@ -150,6 +179,8 @@ usuarios.post('/profile/:user_id', (req, res) => {
         }
     })
 })
+// Oscar Rosete Deliverable ENDS
+
 //REGISTRO
 usuarios.post('/register', (req, res) => {
     const today = new Date();
