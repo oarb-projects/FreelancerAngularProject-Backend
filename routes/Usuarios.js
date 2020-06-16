@@ -4,16 +4,13 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
+// acquiring sequelize models
 // const Usuario = require("../models/Usuario");
 const db = require('../database/db.js');
-// const Compania = db.Compania ;
 const Usuario = db.User;
 const Compania=db.Compania;
 const Detalle_Alta=db.Detalle_Alta;
 const Detalle_Baja=db.Detalle_Baja;
-// Detalle_Alta
-
-
 
 usuarios.use(cors());
 
@@ -22,7 +19,6 @@ process.env.SECRET_KEY = 'secret';
 // Oscar Rosete Deliverable BEGINS
 //Get All Sellers
 usuarios.get('/vendedores/:company_id', (req, res) => {
-    console.log(req.params.company_id)
     Compania.findAll({
         where: {
             com_id:req.params.company_id
@@ -60,24 +56,18 @@ usuarios.post('/vendedores/:company_id', (req, res) => {
         if (!usuario) {
             let hash = bcrypt.hashSync(usuarioData.usu_password, 10);
             usuarioData.usu_password = hash;
-            console.log("======post request")
-            console.log(req.params.company_id)
             Compania.findAll({
                 where: {
                     com_id:req.params.company_id
                 }
             }).then( company => {
                 Usuario.create(usuarioData).then(usuario => {
-                    // console.log(usuario)
                     company[0].addSellers([usuario]).then(associatedTasks => {
                         let detail={
                             com_id:associatedTasks[0].com_id,
                             usu_id:associatedTasks[0].usu_id
                         }
                         Detalle_Alta.create(detail).then((createdDetail)=>{
-                            console.log("====added to detalle alta")
-                            console.log(detail)  
-                            console.log(createdDetail)  
                             res.json({
                                 detail:createdDetail,
                                 associatedTasks:associatedTasks
@@ -105,28 +95,19 @@ usuarios.post('/vendedores/:company_id', (req, res) => {
 })
 //Delete Seller
 usuarios.delete('/profile/:user_id',(req,res)=>{
-    console.log("==============delete route")
     Usuario.findOne({
         where:{
             usu_id:req.params.user_id
         }
     }).then((user)=>{
-        console.log(req.params.user_id)
-        console.log(req.body)
         user.update({
             usu_activo:0
         }).then((user)=>{
-            // res.json(user)
-            console.log("===detail object")
             let detail={
                 com_id: Number(req.body.company),
                 usu_id:req.body.userId
             }
-            console.log(detail)
-            Detalle_Baja.create(detail).then((createdDetail)=>{
-                console.log("====added to detalle alta")
-                console.log(detail)  
-                console.log(createdDetail)  
+            Detalle_Baja.create(detail).then((createdDetail)=>{ 
                 res.json({
                     detail:createdDetail,
                     user
@@ -146,9 +127,7 @@ usuarios.get('/profile/:user_id', (req, res) => {
         }
     }).then(usuario => {
         if (usuario) {
-            console.log(req.params.user_id);
             res.json(usuario);
-            // console.log(usuario);
         }
         else{
             res.json({
@@ -159,8 +138,6 @@ usuarios.get('/profile/:user_id', (req, res) => {
 })
 //Edit Seller
 usuarios.post('/profile/:user_id', (req, res) => {
-    console.log("you are trying to modify an user");
-    console.log(req.body)
     let modifiedUser=req.body;
     Usuario.findOne({        
         where: {

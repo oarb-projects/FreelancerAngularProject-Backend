@@ -12,7 +12,6 @@ module.exports = (sequelize,Sequelize) => {
             type: Sequelize.STRING
         },
         precio: {
-            // type: Sequelize.NUMBER
             type: Sequelize.FLOAT
         },
         imagen: {
