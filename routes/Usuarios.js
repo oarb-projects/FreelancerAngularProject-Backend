@@ -110,7 +110,46 @@ usuarios.delete('/profile/:user_id',(req,res)=>{
 
 })
 
+usuarios.get('/profile/:user_id', (req, res) => {
+    Usuario.findOne({        
+        where: {
+            usu_id: req.params.user_id
+        }
+    }).then(usuario => {
+        if (usuario) {
+            console.log(req.params.user_id);
+            res.json(usuario);
+            // console.log(usuario);
+        }
+        else{
+            res.json({
+                usuario:"no existe"
+            })
+        }
+    })
+})
 
+usuarios.post('/profile/:user_id', (req, res) => {
+    console.log("you are trying to modify an user");
+    console.log(req.body)
+    let modifiedUser=req.body;
+    Usuario.findOne({        
+        where: {
+            usu_id: req.params.user_id
+        }
+    }).then(usuario => {
+        if (usuario) {
+            usuario.update(modifiedUser).then((user)=>{
+                res.json(user)
+            })
+        }
+        else{
+            res.json({
+                usuario:"no existe"
+            })
+        }
+    })
+})
 //REGISTRO
 usuarios.post('/register', (req, res) => {
     const today = new Date();
