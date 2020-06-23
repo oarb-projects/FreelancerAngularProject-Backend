@@ -75,7 +75,6 @@ let AstraZeneca={
 exports.init = (req, res) => {
     let usersArray=[oscar,erick,Liz,Axel,Ashanti]
     User.bulkCreate(usersArray, {returning: true}).then((createdUsers)=>{
-
          //(if you try to immediately return the Model after bulkCreate, the ids may all show up as 'null')
          var correos = createdUsers.map((inst)=> {
             return inst.usu_correo;
@@ -98,54 +97,3 @@ exports.init = (req, res) => {
         res.json(error);
     })
 }
-
-
-//   User.create({
-//     firstname: "Jack",
-//     lastname: "Davis",
-//     age: 37    
-//   }).then(jack => {
-//       let users = [jack];
-      
-//       return User.create({
-//         firstname: "Mary",
-//         lastname: "Taylor",
-//         age: 21
-//       }).then(mary => {
-//         users.push(mary);
-//         return users;
-//       })
-//   }).then(users => {
-//     Project.create({
-//       code: 'P-123',
-//       name: 'JSA - Branding Development'
-//     }).then(p123 => {
-//       p123.setWorkers(users);
-//     })
-    
-//     Project.create({
-//       code: 'P-456',
-//       name: 'JSA - DataEntry Development'
-//     }).then(p456 => {
-//       p456.setWorkers(users);
-//     })
-//   }).then(() => {
-//     res.send("OK");
-//   });
-// };
- 
-// Fetch all Projects include Users
-// exports.findAll = (req, res) => {
-//   Project.findAll({
-//     attributes: ['code', 'name'],
-//     include: [{
-//       model:User, as: 'Workers',
-//       attributes: [['firstname', 'name'], 'age'],
-//       through: {
-//         attributes: ['projectId', 'userId'],
-//       }
-//       }]
-//   }).then(projects => {
-//      res.send(projects);
-//   });
-// };
