@@ -2,9 +2,7 @@ const db = require('../database/db.js');
 const Compania = db.Compania ;
 const User = db.User;
 const { Op } = require("sequelize");
-
 const bcrypt = require('bcrypt');
-// let hash = bcrypt.hashSync(usuarioData.usu_password, 10);
 
 let oscar={     
     usu_nombre: "oscar2",
@@ -72,20 +70,9 @@ let AstraZeneca={
     com_activo: 2
 }
 
+
 // Init data: Projects & Users
 exports.init = (req, res) => {
-    // User.create(oscar).then(oscar => {
-    //     // console.log(oscar)
-    //     var users=[oscar];
-    //     User.create(erick).then(erick=>{
-    //         users.push(erick);
-    //         Compania.create(Gnerd).then((Gnerd)=>{
-    //             // console.log(users)
-    //             Gnerd.setSellers(users);
-    //             res.send("OK");  
-    //         })
-    //     })
-    // })
     let usersArray=[oscar,erick,Liz,Axel,Ashanti]
     User.bulkCreate(usersArray, {returning: true}).then((createdUsers)=>{
 
@@ -102,11 +89,7 @@ exports.init = (req, res) => {
             }   
         });
     }).then((createdUsers)=>{
-        // let stuff=json(createdUsers);
-        // console.log("======users to set")
-        // console.log(createdUsers)
         Compania.create(AstraZeneca).then((AstraZeneca)=>{
-            // console.log(users)
             AstraZeneca.setSellers(createdUsers);
             res.send("OK");  
         })

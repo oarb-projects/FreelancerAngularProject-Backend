@@ -11,6 +11,8 @@ const Usuario = db.User;
 const Compania=db.Compania;
 const Detalle_Alta=db.Detalle_Alta;
 const Detalle_Baja=db.Detalle_Baja;
+const Property = db.Propiedad;
+const properties=require("../controller/properties.controller")
 
 usuarios.use(cors());
 
@@ -157,6 +159,21 @@ usuarios.post('/profile/:user_id', (req, res) => {
     })
 })
 // Oscar Rosete Deliverable ENDS
+
+// Oscar Rosete Deliverable 2 BEGINS
+//Get All Properties
+usuarios.get('/propiedades/:company_id',properties.getAllProperties) 
+//Get Property Info
+usuarios.get('/propiedad/:propiedad_id', properties.getPropertyById)
+//Generate Property
+usuarios.post('/propiedad/:company_id',properties.addPropertyToCompany)
+//Edit Property
+usuarios.put('/propiedad/:propiedad_id',properties.editProperty)
+//Delete Property
+usuarios.delete('/propiedad/:propiedad_id',properties.deleteProperty)
+// Oscar Rosete Deliverable 2 ENDS
+
+
 
 //REGISTRO
 usuarios.post('/register', (req, res) => {
