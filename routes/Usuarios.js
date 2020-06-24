@@ -163,10 +163,10 @@ usuarios.post('/profile/:user_id', (req, res) => {
 // Oscar Rosete Deliverable 2 BEGINS
 //Get All Properties
 usuarios.get('/propiedades/:company_id',properties.getAllProperties) 
+//Generate Property
+usuarios.post('/propiedades/:company_id',properties.addPropertyToCompany)
 //Get Property Info
 usuarios.get('/propiedad/:propiedad_id', properties.getPropertyById)
-//Generate Property
-usuarios.post('/propiedad/:company_id',properties.addPropertyToCompany)
 //Edit Property
 usuarios.put('/propiedad/:propiedad_id',properties.editProperty)
 //Delete Property
@@ -229,6 +229,7 @@ usuarios.post('/login', (req, res) => {
             let token = jwt.sign(usuario.dataValues, process.env.SECRET_KEY, {
                 expiresIn: 1440
             });
+            console.log("datos correctos")
             res.json({ token: token });
         } else {
             res.send('Usuario no existe');
