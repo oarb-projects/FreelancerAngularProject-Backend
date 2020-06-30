@@ -37,6 +37,9 @@ app.use('/usuarios', Usuarios);
 const Productos = require('./routes/Productos');
 app.use('/productos', Productos);
 
+const Publish = require('./routes/Publish.routes');
+app.use('/publish', Publish);
+
 //publicos
 
 //inciar el servidor
