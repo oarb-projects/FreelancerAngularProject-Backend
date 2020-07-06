@@ -32,6 +32,7 @@ db.Detalle_Baja = require("../models/Detalle_Baja")(sequelize, Sequelize);
 db.Propiedad = require("../models/Propiedad")(sequelize, Sequelize);
 db.Detalle_Alta_Propiedad= require("../models/Detalle_Alta_Propiedad")(sequelize, Sequelize);
 db.Detalle_Baja_Propiedad= require("../models/Detalle_Baja_Propiedad")(sequelize, Sequelize);
+
 //PUBLISH PROPERTIES TABLE GENERATION
 db.Publicaciones = require("../models/Publicaciones")(sequelize, Sequelize);
 

@@ -1,5 +1,5 @@
 module.exports = (sequelize,Sequelize) => {
-    const Publicacion=sequelize.define('propiedad',
+    const Publicacion=sequelize.define('publicacion',
     {
         id_publicacion: {
             type: Sequelize.INTEGER,

@@ -14,9 +14,129 @@ const Detalle_Baja=db.Detalle_Baja;
 const Property = db.Propiedad;
 const properties=require("../controller/properties.controller")
 
+//Oscar Rosete Deliverable 3 BEGINS
+const {htmlContent2} =require("../helpers/Email/clienteInmuebles")
+const {sendEmail} =require("../helpers/Email/sendEmail")
+
 usuarios.use(cors());
 
 process.env.SECRET_KEY = 'secret';
+
+//Oscar Rosete Deliverable 3 BEGINS
+const smtpClient = {
+    host: process.env.SMTPHOST,
+    port: 465,
+    auth: {
+      user: process.env.SMTPUSER,
+      pass:  process.env.SMTPPASSWORD,
+    },
+    tls: {
+        rejectUnauthorized: false
+    }
+};    
+sendMail=(newUser,req,res,created)=>{
+    console.log("==========sending email")
+    const vendedorEmail="oscaralonso11@hotmail.com"
+    let base_url=newUser.webpage;
+    const confirmUrL=base_url+"/usuarios/verificar_correo"
+    console.log(smtpClient)
+
+    console.log("====enviado a ")
+    console.log(newUser.email)
+    const clienteEmail=newUser.email
+
+    // for trials
+    // const clienteEmail="oscar.rosete@cetys.mx"
+    //=============correo al vendedor
+    console.log(req.body)
+    const emailContent={
+        name:newUser.names+" "+newUser.lastNames,
+        email:newUser.email,
+        query:confirmUrL+"?correo="+clienteEmail
+        // +"&id="+clienteEmail
+    }
+    //======correo al cliente
+    const content2=htmlContent2(emailContent);
+    let emailInfo2={
+        to:clienteEmail,
+        subject:"Registro Inmuebles 82",
+        htmlContent:content2,
+         attachments: [{
+            filename: 'logo.png',
+            path:"./public/images/logo.png",
+            cid: 'logo', //same cid value as in the html img src
+         }],   
+        smtpClient,
+    }
+    const isSend2 = sendEmail(emailInfo2);
+
+
+    if( !isSend2){
+        console.log("it was not sent")
+        // res.status(400).send({ error: "server error" });
+    }else{
+        let json;
+        if(created)
+            json={created:true,status:"success",confirmed:false}
+        else{
+            json={created:false,status:"success",confirmed:false}
+        }
+        console.log("it was sent")
+        // res.status(200).json(json) 
+    }
+}
+usuarios.get('/verificar_correo', (req, res) => {
+    let frontendUrl='http://localhost:4200/'
+    console.log(req.query);
+    Usuario.findOne({        
+        where: {
+            usu_correo: req.query.correo
+        },
+    }).then(usuario => {
+        if (usuario) {
+            let userToModify={
+                ...usuario.toJSON(),
+                usu_correo_valido:1
+            }
+            usuario.update(userToModify).then((modifiedUser)=>{
+                console.log(modifiedUser)
+                res.redirect(frontendUrl+'login');
+            })
+        } else {
+            res.json({ error: 'Usuario no existe' });
+        }
+    })
+})
+usuarios.get('/resend/:email', (req, res) => {
+    console.log(req.params.email)
+    Usuario.findOne({        
+        where: {
+            usu_correo: req.params.email
+        },
+    }).then(usuario => {
+        if (usuario) {
+            // console.log(usuario)
+            let newUser={
+                userName:usuario.usu_nombre,
+                names:usuario.usu_nombre,
+                lastNames:usuario.usu_apellido,
+                role:"superAdmin",
+                email:usuario.usu_correo,
+                password:usuario.usu_password,
+                confirmedEmail:"false",
+                webpage:"http://localhost:4000"
+            }
+            sendMail(newUser,req,res,true);
+            console.log(newUser)
+            res.status(200).json({
+                status:"Email sent"
+            })
+        } else {
+            res.json({ error: 'Usuario no existe' });
+        }
+    })
+})
+//Oscar Rosete Deliverable 3 ENDS
 
 // Oscar Rosete Deliverable BEGINS
 //Get All Sellers
@@ -173,8 +293,6 @@ usuarios.put('/propiedad/:propiedad_id',properties.editProperty)
 usuarios.delete('/propiedad/:propiedad_id',properties.deleteProperty)
 // Oscar Rosete Deliverable 2 ENDS
 
-
-
 //REGISTRO
 usuarios.post('/register', (req, res) => {
     const today = new Date();
@@ -187,8 +305,20 @@ usuarios.post('/register', (req, res) => {
         usu_telefono_oficina: req.body.telefonoOficina,
         usu_pagina_web: req.body.paginaWeb,
         usu_id_rol: 1,
-        usu_activo: 1
+        usu_activo: 1,
+        usu_correo_valido: 0
         //nombreCompania: registerFormValue.nombreCompania,        
+    }
+
+    let newUser={
+        userName:usuarioData.usu_nombre,
+        names:usuarioData.usu_nombre,
+        lastNames:usuarioData.usu_apellido,
+        role:"superAdmin",
+        email:usuarioData.usu_correo,
+        password:usuarioData.usu_password,
+        confirmedEmail:"false",
+        webpage:"http://localhost:4000"
     }
 
     Usuario.findOne({        
@@ -205,6 +335,10 @@ usuarios.post('/register', (req, res) => {
                     let token = jwt.sign(usuario.dataValues, process.env.SECRET_KEY, {
                         expiresIn: 1440
                     });
+                    // res.send("ok")
+                    sendMail(newUser,req,res,true);
+                    console.log(usuarioData)
+                
                     res.json({ token: token });
                 }).catch(err => {
                     res.send('error: ' + err);
@@ -225,17 +359,29 @@ usuarios.post('/login', (req, res) => {
             usu_correo: req.body.correo
         }            
     }).then(usuario => {
-        if(bcrypt.compareSync(req.body.password, usuario.usu_password)) {
-            let token = jwt.sign(usuario.dataValues, process.env.SECRET_KEY, {
-                expiresIn: 1440
-            });
-            console.log("datos correctos")
-            res.json({ token: token });
-        } else {
-            res.send('Usuario no existe');
+        if(usuario){
+            if(bcrypt.compareSync(req.body.password, usuario.usu_password)) {
+                let token = jwt.sign(usuario.dataValues, process.env.SECRET_KEY, {
+                    expiresIn: 1440
+                });
+                if(usuario.usu_correo_valido){
+                    console.log("datos correctos")
+                    console.log(token)
+                    res.json({ token: token });
+                }
+                else{
+                    console.log(usuario.usu_correo_valido)
+                    res.status(403).send({code:1,error:"Correo no validado"});
+                }
+            } else {
+                res.status(403).send({code:2,error:"datos incorrectos"});
+            }
+        }
+        else{
+            res.status(403).send({code:3,error:"Usuario no existente"});
         }
     }).catch(err => {        
-        res.send('error: ' + err);
+        res.send({error:err});
     });    
 });
 

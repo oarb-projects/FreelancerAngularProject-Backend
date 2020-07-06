@@ -67,7 +67,8 @@ module.exports = (sequelize,Sequelize) => {
         }     
     },
     {
-        timestamps: false
+        timestamps: false,
+        tableName: 'PROPIEDADES'
     })
     return Propiedad;
 }

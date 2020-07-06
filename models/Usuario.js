@@ -14,6 +14,9 @@ module.exports = (sequelize,Sequelize) => {
         usu_correo: {
             type: Sequelize.STRING
         },
+        usu_correo_valido: {
+            type: Sequelize.INTEGER
+        },
         usu_password: {
             type: Sequelize.STRING
         },
